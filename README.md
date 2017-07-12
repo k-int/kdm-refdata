@@ -1,5 +1,7 @@
 # KI Refdata Domain Model
 
+KI domain model plugins should ONLY contain domain classes.
+
 KI Projects are constructed of modular/reusable domain models which can be used to share data between services if needed. Sometimes services will use API level interactions,
 but some data structures are best considered shared and enable interaction at the storage module.
 

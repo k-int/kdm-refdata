@@ -5,7 +5,7 @@ class RefdataValue {
   /**
    * Owning category that this value belongs to
    */
-  GlobalCategory owner
+  RefdataCategory owner
 
   /**
    * Shortcode for this value. 
