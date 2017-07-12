@@ -8,7 +8,12 @@ class RefdataValue {
   RefdataCategory owner
 
   /**
-   * Shortcode for this value. 
+   * Shortcode for this value. Shortcodes SHOULD be constrained to 'A..Za..z0..9' and '_' or '-' shortcodes MUST NOT contain contain ' ', ':', '.' or any quote marks
+   * Examples of good shortcodes: PENDING, IN_PROCESS, CHECKED_IN, CheckedIn, Checked-In
+   * Examples of bad shortcodes: "CHECKED IN" "SOME.VALUE" "SOME:VALUE"
+   * 
+   * The java convention is for shortcodes to be camel case, ISO protocols tend to use uppercase and underscore. Within the constraints above,
+   * it's probably best to use the format in the controlled list if it has one, otherwise fall back to camel case.
    */
   String shortcode
 
