@@ -2,7 +2,7 @@
 grails:
     profile: web-plugin
     codegen:
-        defaultPackage: refdata.dm
+        defaultPackage: com.k_int.dm.refdata
     spring:
         transactionManagement:
             proxies: false
