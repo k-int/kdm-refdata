@@ -30,16 +30,22 @@ class RefdataCategory {
     categoryStatus column:'krc_status'
   }
 
-  def public static lookupOrCreateGlobal(category_shortcode) {
-    lookupOrCreate(null,category_shortcode)
+  public static RefdataCategory lookupOrCreateGlobal(String category_shortcode) {
+    return RefdataCategory.lookupOrCreate(null,category_shortcode)
   }
 
-  def public static lookupOrCreate(owner,category_shortcode) {
-    def result = RefdataCategory.findByOwnerAndShortcode(owner,category_shortcode) 
+  public static RefdataCategory lookupOrCreate(Tenant owner,String category_shortcode) {
+
+    RefdataCategory result = RefdataCategory.findByOwnerAndShortcode(owner,category_shortcode) 
+
     if ( result == null ) {
-      result = new RefdataCategory(owner:owner, shortcode:category_shortcode).save(flush:true, failOnError:true);
+      result = new RefdataCategory(owner:owner, 
+                                   shortcode:category_shortcode
+                                   // ,categoryStatus:RefdataValue.findByShortcode('ACTIVE')
+                                  ).save(flush:true, failOnError:true);
     }
-    result
+
+    return result
   }
 
   public String toString() {

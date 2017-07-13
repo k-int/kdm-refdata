@@ -3,11 +3,6 @@ package com.k_int.dm.refdata
 class RefdataValue {
 
   /**
-   * Owning category that this value belongs to
-   */
-  RefdataCategory category
-
-  /**
    * Shortcode for this value. Shortcodes SHOULD be constrained to 'A..Za..z0..9' and '_' or '-' shortcodes MUST NOT contain contain ' ', ':', '.' or any quote marks
    * Examples of good shortcodes: PENDING, IN_PROCESS, CHECKED_IN, CheckedIn, Checked-In
    * Examples of bad shortcodes: "CHECKED IN" "SOME.VALUE" "SOME:VALUE"
@@ -16,6 +11,11 @@ class RefdataValue {
    * it's probably best to use the format in the controlled list if it has one, otherwise fall back to camel case.
    */
   String shortcode
+
+  /**
+   * Owning category that this value belongs to
+   */
+  RefdataCategory category
 
   /**
    * Default label in the absence of i8n values
@@ -62,19 +62,25 @@ class RefdataValue {
     def cat = RefdataCategory.lookupOrCreateGlobal(category_shortcode);
 
     // Lookup or create the value, groovy will automatically retrun the result of the last evaluated statement in a function
-    def result = RefdataValue.findByCategoryAndShortcode(cat,value_shortcode) 
+    RefdataValue result = RefdataValue.findByCategoryAndShortcode(cat,value_shortcode) 
 
     if ( result == null ) {
-      result = new RefdataValue(category:cat, shortcode:value_shortcode, defaultLabel:default_label).save(flush:true, failOnError:true)
+      result = new RefdataValue()
+      result.category = cat
+      result.shortcode=value_shortcode
+      result.defaultLabel=default_label
+      result.save(flush:true, failOnError:true)
     }
 
     println("Returning ${result}");
-    result
+    return result
   }
 
   public static RefdataValue resolve(String status_str) {
-    def status_components = status_str.split(':');
-    def result = null;
+
+    String[] status_components = status_str.split(':');
+    RefdataValue result = null;
+
     if ( status_components.length == 2 ) {
       def vl = RefdataValue.executeQuery('select rdv from RefdataValue as rdv where rdv.category.shortcode = :os and rdv.shortcode = :s',
                                          [os:status_components[0],s:status_components[1]]);
@@ -86,7 +92,7 @@ class RefdataValue {
       throw new RuntimeException("resolve requires a colon separated string formatted as CATEGORY_SHORTCODE:VALUE_SHORTCODE but received \"${status_str}\"");
     }
 
-    result
+    return result
   }
 
   public String toString() {
