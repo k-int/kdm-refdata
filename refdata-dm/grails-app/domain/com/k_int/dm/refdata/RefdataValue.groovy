@@ -5,7 +5,7 @@ class RefdataValue {
   /**
    * Owning category that this value belongs to
    */
-  RefdataCategory owner
+  RefdataCategory category
 
   /**
    * Shortcode for this value. Shortcodes SHOULD be constrained to 'A..Za..z0..9' and '_' or '-' shortcodes MUST NOT contain contain ' ', ':', '.' or any quote marks
@@ -38,7 +38,7 @@ class RefdataValue {
   RefdataValue status
 
   static constraints = {
-    owner nullable:false, blank: false
+    category nullable:false, blank: false
     shortcode nullable:false, blank: false
     defaultLabel nullable:false, blank: false
     sortKey nullable:true, blank: false
@@ -49,7 +49,7 @@ class RefdataValue {
   static mapping = {
     table 'ki_refdata_value'
     id column:'krv_id'
-    owner column:'krv_krc_id'
+    category column:'krv_krc_id'
     shortcode column:'krv_shortcode'
     defaultLabel column:'krv_default_label'
     sortKey column:'krv_sort_key'
@@ -57,26 +57,26 @@ class RefdataValue {
     status column:'krv_status'
   }
 
-  def public static  lookupOrCreateGlobal(category_shortcode, value_shortcode, default_label) {
-
+  public static RefdataValue lookupOrCreateGlobal(String category_shortcode, String value_shortcode, String default_label) {
     // Lookup or create the category
     def cat = RefdataCategory.lookupOrCreateGlobal(category_shortcode);
 
     // Lookup or create the value, groovy will automatically retrun the result of the last evaluated statement in a function
-    def result = RefdataValue.findByOwnerAndShortcode(cat,value_shortcode) 
+    def result = RefdataValue.findByCategoryAndShortcode(cat,value_shortcode) 
 
     if ( result == null ) {
-      result = new RefdataValue(owner:cat, shortcode:value_shortcode, defaultLabel:default_label).save(flush:true, failOnError:true)
+      result = new RefdataValue(category:cat, shortcode:value_shortcode, defaultLabel:default_label).save(flush:true, failOnError:true)
     }
 
+    println("Returning ${result}");
     result
   }
 
-  def public static resolve(status_str) {
+  public static RefdataValue resolve(String status_str) {
     def status_components = status_str.split(':');
     def result = null;
     if ( status_components.length == 2 ) {
-      def vl = RefdataValue.executeQuery('select rdv from RefdataValue as rdv where rdv.owner.shortcode = :os and rdv.shortcode = :s',
+      def vl = RefdataValue.executeQuery('select rdv from RefdataValue as rdv where rdv.category.shortcode = :os and rdv.shortcode = :s',
                                          [os:status_components[0],s:status_components[1]]);
       if ( vl.size() == 1 ) {
         result=vl.get(0);
@@ -85,6 +85,11 @@ class RefdataValue {
     else {
       throw new RuntimeException("resolve requires a colon separated string formatted as CATEGORY_SHORTCODE:VALUE_SHORTCODE but received \"${status_str}\"");
     }
+
     result
+  }
+
+  public String toString() {
+    "RefdataValue(${id},${category.id}:${category.shortcode},${shortcode},${defaultLabel},${sortKey})"
   }
 }
