@@ -37,8 +37,6 @@ class RefdataValue {
    */
   RefdataValue status
 
-
-
   static constraints = {
     owner nullable:false, blank: false
     shortcode nullable:false, blank: false
@@ -59,4 +57,34 @@ class RefdataValue {
     status column:'krv_status'
   }
 
+  def public static  lookupOrCreateGlobal(category_shortcode, value_shortcode, default_label) {
+
+    // Lookup or create the category
+    def cat = RefdataCategory.lookupOrCreateGlobal(category_shortcode);
+
+    // Lookup or create the value, groovy will automatically retrun the result of the last evaluated statement in a function
+    def result = RefdataValue.findByOwnerAndShortcode(cat,value_shortcode) 
+
+    if ( result == null ) {
+      result = new RefdataValue(owner:cat, shortcode:value_shortcode, defaultLabel:default_label).save(flush:true, failOnError:true)
+    }
+
+    result
+  }
+
+  def public static resolve(status_str) {
+    def status_components = status_str.split(':');
+    def result = null;
+    if ( status_components.length == 2 ) {
+      def vl = RefdataValue.executeQuery('select rdv from RefdataValue as rdv where rdv.owner.shortcode = :os and rdv.shortcode = :s',
+                                         [os:status_components[0],s:status_components[1]]);
+      if ( vl.size() == 1 ) {
+        result=vl.get(0);
+      }
+    }
+    else {
+      throw new RuntimeException("resolve requires a colon separated string formatted as CATEGORY_SHORTCODE:VALUE_SHORTCODE but received \"${status_str}\"");
+    }
+    result
+  }
 }
