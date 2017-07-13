@@ -39,10 +39,14 @@ class RefdataCategory {
     RefdataCategory result = RefdataCategory.findByOwnerAndShortcode(owner,category_shortcode) 
 
     if ( result == null ) {
-      result = new RefdataCategory(owner:owner, 
-                                   shortcode:category_shortcode
-                                   // ,categoryStatus:RefdataValue.findByShortcode('ACTIVE')
-                                  ).save(flush:true, failOnError:true);
+
+      RefdataValue status_active = RefdataValue.resolve('GLOBAL_ROW_STATUS:ACTIVE');
+
+      result = new RefdataCategory()
+      result.owner=owner
+      result.shortcode=category_shortcode
+      result.categoryStatus = status_active
+      result.save(flush:true, failOnError:true);
     }
 
     return result
