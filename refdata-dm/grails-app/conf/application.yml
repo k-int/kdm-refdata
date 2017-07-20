@@ -115,7 +115,8 @@ environments:
                     schemaHandler: com.k_int.gorm.multitenant.SchemaHandler
                     # tenantResolverClass: org.grails.datastore.mapping.multitenancy.web.SystemPropertyTenantResolver
         dataSource:
-            dbCreate: create-drop
+            # dbCreate: create-drop  - create drops all before creating, create-drop drops after running all tests.
+            dbCreate: create
             username: knowint
             password: knowint
             driverClassName: org.postgresql.Driver

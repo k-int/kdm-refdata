@@ -37,7 +37,6 @@ public class SchemaHandler implements org.grails.datastore.gorm.jdbc.schema.Sche
     @Override
     void useSchema(Connection connection, String name) {
         String useStatement = String.format(useSchemaStatement, name)
-        println("\n\nuseSchema(${name}) :: ${useStatement} \n\n");
         log.debug("Executing SQL Set Schema Statement: ${useStatement}")
         connection
                 .createStatement()
@@ -56,7 +55,6 @@ public class SchemaHandler implements org.grails.datastore.gorm.jdbc.schema.Sche
     void createSchema(Connection connection, String name) {
         String schemaCreateStatement = String.format(createSchemaStatement, name)
         log.debug("Executing SQL Create Schema Statement: ${schemaCreateStatement}")
-        println("Executing SQL Create Schema Statement: ${schemaCreateStatement}")
         connection
                 .createStatement()
                 .execute(schemaCreateStatement)
