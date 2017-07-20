@@ -14,6 +14,16 @@ grails:
             # Whether to translate GORM events into Reactor events
             # Disabled by default for performance reasons
             events: false
+        multiTenancy:
+            # http://gorm.grails.org/6.0.x/hibernate/manual/#_schema_per_tenant
+            mode: SCHEMA
+            # SessionTenantResolver requires a gorm.tenantId attribute on the HTTPRequest - we use a filter to 
+            # Set this depending upon the target environment
+            # tenantResolverClass: org.grails.datastore.mapping.multitenancy.web.SessionTenantResolver
+            # NOrmally we would do this via the spring tenantResolver bean - but for testing purposes, we use the static config provided by this class
+            # For transparency, we also override this setting in the environments setting below, making this setting redundant, but it's left here
+            # for visibility
+            tenantResolverClass: com.k_int.gorm.multitenant.SessionTenantResolver
 info:
     app:
         name: '@info.app.name@'
@@ -98,7 +108,20 @@ hibernate:
 
 environments:
     test:
+        grails:
+            gorm:
+                multiTenancy:
+                    tenantResolverClass: com.k_int.gorm.multitenant.SessionTenantResolver
+                    schemaHandler: com.k_int.gorm.multitenant.SchemaHandler
+                    # tenantResolverClass: org.grails.datastore.mapping.multitenancy.web.SystemPropertyTenantResolver
         dataSource:
             dbCreate: create-drop
-            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-
+            username: knowint
+            password: knowint
+            driverClassName: org.postgresql.Driver
+            dialect: org.hibernate.dialect.PostgreSQL82Dialect
+            url: jdbc:postgresql://localhost:5432/knowint_test
+            # Schema handler is like the default except it does CREATE SCHEMA IF NOT EXISTS X instead of CREATE SCHEMA X
+            schemaHandler: com.k_int.gorm.multitenant.SchemaHandler
+#            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#            dialect: com.k_int.yarm.utils.PgSQLCustomDialect

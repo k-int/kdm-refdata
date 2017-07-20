@@ -37,3 +37,13 @@ To upload the release to nexus, make sure your ~/.gradle/gradle.properties file 
 
 Depending upon your personal preference.
 
+
+
+# Functional/Integration Testing
+
+Requires a local postgres system with the following config
+
+CREATE DATABASE knowint_test;
+CREATE USER knowint WITH PASSWORD 'knowint';
+GRANT ALL PRIVILEGES ON DATABASE knowint_test to knowint;
+

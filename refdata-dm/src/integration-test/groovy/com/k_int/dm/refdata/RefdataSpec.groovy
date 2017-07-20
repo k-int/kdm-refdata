@@ -5,15 +5,29 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
 import com.k_int.dm.refdata.*
+import java.lang.Override
+
+import org.grails.datastore.mapping.multitenancy.resolvers.SystemPropertyTenantResolver
+
+/**
+ * See: http://guides.grails.org/grails-mock-basics/guide/index.html
+ */
 
 @Integration
 @Rollback
 class RefdataSpec extends Specification {
 
+    // @Override
+    //Map getConfiguration() {
+    //  [(Settings.SETTING_MULTI_TENANT_RESOLVER_CLASS): SystemPropertyTenantResolver]
+    //}
+
     def setup() {
+      System.setProperty(SystemPropertyTenantResolver.PROPERTY_NAME, 'ki_test_tenant') 
     }
 
     def cleanup() {
+      System.setProperty(SystemPropertyTenantResolver.PROPERTY_NAME, '') 
     }
 
     void "Ensure DB Empty at start"() {
